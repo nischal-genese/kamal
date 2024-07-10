@@ -6,8 +6,10 @@ image: nischalgenese/react
 
 # Deploy to these servers.
 servers:
-  - kamal1
-  - kamal2
+  web:
+    hosts:
+      - kamal1
+    
 
 # Credentials for your image host.
 registry:
@@ -65,10 +67,29 @@ ssh:
 #       - data:/data
 
 # Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
-# traefik:
-#   args:
-#     accesslog: true
-#     accesslog.format: json
+traefik:
+  image: traefik:v3.0.0-beta5
+  options:
+    publish:
+      - "8080:8080"
+    volume: "/letsencrypt/acme.json:/letsencrypt/acme.json"
+  args:
+    api.dashboard: true
+    api.insecure: true
+    log.level: INFO
+    accesslog.format: json
+    accesslog.filters.statusCodes: "400-599"
+    accesslog.filters.retryAttempts: true
+    accesslog.filters.minDuration: 101ms
+
+    entryPoints.web.address: ":80"
+    entryPoints.websecure.address: ":443"
+  labels:
+    traefik.enable: true
+    traefik.http.routers.dashboard.rule: Host(`kamal.valmikiai.com`)
+    traefik.http.routers.dashboard.service: api@internal
+    traefik.http.routers.dashboard.middlewares: auth
+    traefik.http.middlewares.auth.basicauth.users: xxxXXXXxxxx
 
 # Configure a custom healthcheck (default is /up on port 3000)
 healthcheck:

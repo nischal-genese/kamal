@@ -1,0 +1,71 @@
+service: example
+image: example/example
+
+env:
+  secret:
+    - SECRET_KEY
+    - DATABASE_URL
+    - CACHE_URL
+
+traefik:
+  image: traefik:v2.9
+  options:
+    publish:
+      - "443:443"
+    volume:
+      - "/etc/traefik/acme/:/etc/traefik/acme/"
+    memory: 500m
+  args:
+    accesslog.format: common
+    entryPoints.web.address: ":80"
+    entryPoints.websecure.address: ":443"
+  env:
+    secret:
+      - CLOUDFLARE_DNS_API_TOKEN
+      - CLOUDFLARE_EMAIL
+
+servers:
+  web:
+    hosts:
+      - 1.2.3.4
+    cmd: bin/app web
+    healthcheck:
+      path: /healthz
+      port: 8000
+      interval: 5s
+      max_attempts: 5
+    options:
+      memory: 250m
+
+accessories:
+  db:
+    image: postgres:15
+    host: 1.2.3.4
+    port: 5432:5432
+    env:
+      secret:
+        - POSTGRES_DB
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+    volumes:
+      - /var/postgres/data:/var/lib/postgresql/data
+    options:
+      memory: 500m
+
+  redis:
+    image: redis:7.0
+    host: 1.2.3.4
+    port: 6379:6379
+    cmd: --maxmemory 200m --maxmemory-policy allkeys-lru
+    volumes:
+      - /var/redis/data:/data
+    options:
+      memory: 250m
+
+registry:
+  username:
+    - DOCKER_REGISTRY_USERNAME
+  password:
+    - DOCKER_REGISTRY_PASSWORD
+
+asset_path: /opt/app/staticfiles
