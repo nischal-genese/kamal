@@ -8,7 +8,7 @@ image: nischalgenese/react
 servers:
   web:
     hosts:
-      - kamal1
+      - 54.213.140.132
     
 
 # Credentials for your image host.
@@ -84,12 +84,6 @@ traefik:
 
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
-  labels:
-    traefik.enable: true
-    traefik.http.routers.dashboard.rule: Host(`kamal.valmikiai.com`)
-    traefik.http.routers.dashboard.service: api@internal
-    traefik.http.routers.dashboard.middlewares: auth
-    traefik.http.middlewares.auth.basicauth.users: xxxXXXXxxxx
 
 # Configure a custom healthcheck (default is /up on port 3000)
 healthcheck:
