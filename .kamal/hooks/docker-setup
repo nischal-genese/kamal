@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+NETWORK_NAME="kamal-network"
+
+if ! docker network inspect "$NETWORK_NAME" &>/dev/null; then
+  # If it doesn't exist, create it
+  docker network create "$NETWORK_NAME"
+  echo "Created Docker network: $NETWORK_NAME"
+else
+  echo "Docker network $NETWORK_NAME already exists, skipping creation."
+fi

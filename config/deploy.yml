@@ -8,8 +8,10 @@ image: nischalgenese/react
 servers:
   web:
     hosts:
-      - 52.66.168.190
-      - 52.66.190.251
+      - 15.207.113.14
+      - 13.235.0.30
+    options:
+      network: "kamal-network"
 
 # Logging for containers
 logging:
@@ -49,27 +51,38 @@ ssh:
 #     host: ssh://app@192.168.0.1
 
 # Use accessory services (secrets come from .env).
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     port: 3306
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: redis:7.0
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  grafana:
+    image: grafana/grafana-enterprise
+    roles: 
+      - web
+    env:
+      clear:
+        GF_SERVER_ROOT_URL: https://grafana.valmikiai.com
+        GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    labels:
+      traefik.enable: true
+      traefik.http.routers.grafana.rule: Host(`grafana.valmikiai.com`)
+      traefik.http.routers.grafana.service: my-app-grafana@docker
+    directories:
+      - data/grafana:/var/lib/grafana
+    options:
+      user: 1000:1000
+      network: "kamal-network"
+  
+  prometheus:
+    image: prom/prometheus:latest
+    roles: 
+      - web
+    port: 9090
+    directories:
+      - data/prometheus:/prometheus
+    files:
+      - infrastructure/prometheus/config.yml:/etc/prometheus/prometheus.yml
+    options:
+      user: 1000:1000
+      network: "kamal-network"
+    cmd: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=30d
 
 # Configure custom arguments for Traefik. Be sure to reboot traefik when you modify it.
 traefik:
@@ -78,6 +91,7 @@ traefik:
     publish:
       - "8080:8080"
     volume: "/letsencrypt/acme.json:/letsencrypt/acme.json"
+    network: "kamal-network"
   args:
     api.dashboard: true
     api.insecure: true
@@ -89,6 +103,9 @@ traefik:
 
     entryPoints.web.address: ":80"
     entryPoints.websecure.address: ":443"
+  labels:
+    traefik.http.routers.dashboard.rule: Host(`traefik.valmikiai.com`)
+    traefik.http.routers.dashboard.service: api@internal
 
 # Configure a custom healthcheck (default is /up on port 3000)
 healthcheck:
