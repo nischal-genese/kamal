@@ -8,7 +8,8 @@ image: nischalgenese/react
 servers:
   web:
     hosts:
-      - 54.213.140.132
+      - 52.66.168.190
+      - 52.66.190.251
     
 
 # Credentials for your image host.
