@@ -10,15 +10,19 @@ servers:
     hosts:
       - 52.66.168.190
       - 52.66.190.251
-    
+
+# Logging for containers
+logging:
+  driver: awslogs
+  options:
+    awslogs-region: ap-south-1
+    awslogs-group: /application
+    awslogs-create-group: true
+    tag: "{{.Name}}-{{.ID}}"
 
 # Credentials for your image host.
 registry:
-  # Specify the registry server, if you're not using Docker Hub
-  # server: registry.digitalocean.com / ghcr.io / ...
   username: nischalgenese
-
-  # Always use an access token rather than real password when possible.
   password:
     - KAMAL_REGISTRY_PASSWORD
 
