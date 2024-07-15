@@ -52,7 +52,7 @@ const App = () => {
       <nav className='navbar navbar-dark bg-primary'>
         <div className='container-fluid'>
           <a className='navbar-brand' href='/'>
-            Finance App
+            Finance App using Kamal
           </a>
         </div>
       </nav>
