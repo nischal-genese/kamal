@@ -4,12 +4,15 @@ service: my-app
 # Name of the container image.
 image: nischalgenese/react
 
+env:
+  secret:
+    - VITE_API_URL
+
 # Deploy to these servers.
 servers:
   web:
     hosts:
-      - 15.207.113.14
-      - 13.235.0.30
+      - 13.201.48.158
     options:
       network: "kamal-network"
 
@@ -28,27 +31,9 @@ registry:
   password:
     - KAMAL_REGISTRY_PASSWORD
 
-# Inject ENV variables into containers (secrets come from .env).
-# Remember to run `kamal env push` after making changes!
-env:
-  clear:
-    VITE_API_URL: https://kamalapi.valmikiai.com
-#   secret:
-#     - RAILS_MASTER_KEY
-
 # Use a different ssh user than root
 ssh:
   user: ubuntu
-
-# Configure builder setup.
-# builder:
-#   args:
-#     RUBY_VERSION: 3.2.0
-#   secrets:
-#     - GITHUB_TOKEN
-#   remote:
-#     arch: amd64
-#     host: ssh://app@192.168.0.1
 
 # Use accessory services (secrets come from .env).
 accessories:
@@ -125,7 +110,7 @@ traefik:
 healthcheck:
   path: /
   port: 3000
-  interval: 10s
+  interval: 5s
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old

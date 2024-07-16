@@ -62,10 +62,13 @@ jobs:
           bundler-cache: true
 
       - name: Install Kamal
-        run: gem install kamal -v 1.7.3
+        run: gem install kamal -v 1.7.3   
 
-      - name: Deploy command
-        run: kamal deploy --skip-push
+      - name: Kamal envify and deploy
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          KAMAL_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_KEY }} 
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          kamal envify
+          kamal deploy --skip-push
